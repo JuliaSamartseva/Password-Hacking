@@ -5,6 +5,14 @@ import itertools
 
 
 class PasswordGenerator:
+    @staticmethod
+    def get_passwords_from_file():
+        file = open('passwords.txt', 'r')
+        dictionary = list()
+        for line in file:
+            dictionary.append(line.rstrip("\n"))
+        return dictionary
+
     # Generator function that returns brute force passwords.
     @staticmethod
     def random_password_generator():
@@ -14,6 +22,20 @@ class PasswordGenerator:
             for i in itertools.product(possible_characters, repeat=password_length):
                 yield i
             password_length += 1
+
+    @staticmethod
+    def most_used_passwords_generator():
+        most_used_passwords = PasswordGenerator.get_passwords_from_file()
+        file = open('passwords.txt', 'r')
+
+        # changing the cases in different letters
+        for line in file:
+            current_password = line.rstrip("\n")
+            if not current_password.isdigit():
+                for var in itertools.product(*([letter.lower(), letter.upper()] for letter in current_password)):
+                    yield "".join(var)
+            else:
+                yield current_password
 
 
 # getting list of arguments
@@ -34,9 +56,9 @@ client_socket.connect(address)
 
 response = None
 password = None
-password_generator = PasswordGenerator.random_password_generator()
+password_generator = PasswordGenerator.most_used_passwords_generator()
 while response != "Connection success!":
-    password = "".join(next(password_generator))
+    password = next(password_generator)
 
     # sending the given password
     bytes_message = password.encode()
